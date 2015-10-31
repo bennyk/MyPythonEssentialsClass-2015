@@ -1,3 +1,6 @@
+"""
+Demonstrate the use of fork to dispatch a list of download task.
+"""
 
 import os
 from helpers import *

@@ -1,4 +1,7 @@
-
+"""
+Demonstrate the use of multiprocessing.Queue to manage a list of URL downloading task. A list of workers are
+pre-spawned to handle the downloading workload independently.
+"""
 import multiprocessing
 from helpers import *
 

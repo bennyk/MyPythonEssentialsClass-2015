@@ -1,4 +1,6 @@
-
+"""
+Demonstrate how to dispatch multiple URL downloading task using multiprocessing.Process.
+"""
 import multiprocessing
 
 from helpers import *

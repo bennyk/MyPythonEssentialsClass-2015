@@ -1,4 +1,7 @@
-
+"""
+Demonstrate how to dispatch a list of URL downloading tasks to a pool of workers managed by multiprocessing.Pool.
+Workloads can be further fine-tuned by the use of chunksize.
+"""
 
 import multiprocessing
 from helpers import *

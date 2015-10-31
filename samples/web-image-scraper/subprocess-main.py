@@ -1,3 +1,6 @@
+"""
+Demonstrate how to spawn a list of subprocesses using subprocess module and curl utility to download a remote URL resource.
+"""
 
 import subprocess
 
