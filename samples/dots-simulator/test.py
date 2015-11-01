@@ -1,15 +1,24 @@
-
+"""
+A collection of test routines used in our development for dots-simulator.
+"""
 import game
 import random
 import math
 
 
 def createRandomBoard():
+    """
+    Create a Board with a random population of dots in our test.
+    :return: Board object
+    """
     r = game.RandomGen({'a': .25, 'b': .25, 'c': .25, 'd': .25})
     b = game.Board(8, 8, r)
     return b
 
 def testRand():
+    """
+    Routine to try out our random generator.
+    """
     occ = {}
     r = game.RandomGen({'a': .25, 'b': .25, 'c': .25, 'd': .25}, limit=1000)
     for x in r:
@@ -21,10 +30,16 @@ def testRand():
     print(occ)
 
 def testBoard():
+    """
+    Routine to try out our random generator and construction of Board.
+    """
     b = createRandomBoard()
     print(b)
 
 def testRemoveFromTile():
+    """
+    Routine to try out removal of any dots from a Board.
+    """
     b = createRandomBoard()
     print("new board {}".format(b))
 
@@ -38,6 +53,9 @@ def testRemoveFromTile():
 
 
 def testSearchAnyConnection():
+    """
+    Routine to try out our connection searching algorithm.
+    """
     b = createRandomBoard()
     print("new board {}".format(b))
 
@@ -48,6 +66,10 @@ def testSearchAnyConnection():
 
 
 def testSearchValidConnection():
+    """
+    Routine to try out our connected dots searching algorithm. Also attempt to remove it from Board once a valid
+    connection were found.
+    """
     b = createRandomBoard()
     print("new board {}".format(b))
 
@@ -61,6 +83,9 @@ def testSearchValidConnection():
     print("post removal {}".format(b))
 
 def testFillHoles():
+    """
+    Routine to try filling up gaps on the Board after some removal attempts.
+    """
     b = createRandomBoard()
     print("new board {}".format(b))
 
@@ -80,7 +105,22 @@ def testFillHoles():
         b.fillHolesWithNewCookies()
         print("post fillHolesWithNewCookies {}".format(b))
 
-def playMultiply(times=10):
+def testPlay():
+    """
+    Play a single game of Dots.
+    """
+    b = createRandomBoard()
+    print("new board {}".format(b))
+    g = game.Game(b)
+    g.play()
+
+def testPlayMultiply(times=10):
+    """
+    Play a Dots game multiple times with each play generate multiple moves. At the start of every play, a new random
+    Board is created anew to start a play iteration. While we are attempting Dots games we would also like to collect
+    interesting statistical data.
+    """
+
     stat = {}
     for i in range(times):
         print('=' * 60)
@@ -103,14 +143,4 @@ def playMultiply(times=10):
     print("final sum after times {}: {}".format(times, stat))
     print("average: {}".format(avg))
 
-
-
-def testPlay():
-    b = createRandomBoard()
-    print("new board {}".format(b))
-    g = game.Game(b)
-    g.play()
-
-def testPlayMultiply():
-    playMultiply()
 

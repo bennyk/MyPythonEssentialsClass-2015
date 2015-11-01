@@ -3,7 +3,17 @@ import random
 import math
 
 class Board:
+    """
+    A Board object represent the Dots puzzle, which is a container for MxN array of tiles. Each tile in turn may contain
+    a 'colored' dot or sometimes can be empty as in blockage tile.
+    """
     def __init__(self, rows, cols, gen):
+        """
+        Create a Board the size as specified by rows X cols. A generator object is used to feed the board with dots.
+        :param rows: number of rows
+        :param cols: number of columns
+        :param gen: a generator object
+        """
         assert isinstance(gen, RandomGen)
 
         self.data = []
@@ -23,15 +33,31 @@ class Board:
                 self.put(i, j, c)
 
     def get(self, i, j):
+        """
+        Get a Tile at location i, j.
+        :param i: index i
+        :param j: index j
+        :return: Tile
+        """
         return self.data[j][i]
 
-    def put(self, i, j, cookie):
-        assert isinstance(cookie, Dot)
+    def put(self, i, j, dot):
+        """
+        Place a dot at location i, j.
+        :param i: index i
+        :param j: index j
+        :param dot: dot object to be placed
+        """
+        assert isinstance(dot, Dot)
         t = self.get(i, j)
         assert isinstance(t, Tile)
-        t.put(cookie)
+        t.put(dot)
 
     def remove(self, conn):
+        """
+        Remove a connection from the board.
+        :param conn: connection object
+        """
         assert isinstance(conn, Connection)
 
         for p in conn:
@@ -43,6 +69,11 @@ class Board:
 
 
     def move(self, src, dst):
+        """
+        Move a dot at location src to dst.
+        :param src: tuple (i, j) indicating a source location on the Board
+        :param dst: tuple (p, q) indicating a destination location on the Board
+        """
         i, j = src
         p, q = dst
         srcTile = self.get(i, j)
@@ -50,16 +81,20 @@ class Board:
 
         assert isinstance(srcTile, Tile)
         assert isinstance(dstTile, Tile)
-        assert srcTile.cookie is not None, "src tile can't be empty in move(): {}".format(srcTile)
-        assert dstTile.cookie is None, "dst tile must be empty in move(): {}".format(dstTile)
+        assert srcTile.dot is not None, "src tile can't be empty in move(): {}".format(srcTile)
+        assert dstTile.dot is None, "dst tile must be empty in move(): {}".format(dstTile)
 
-        srcCookie = srcTile.cookie
+        srcCookie = srcTile.dot
         assert isinstance(srcCookie, Dot)
 
         srcTile.removeCookie()
         dstTile.put(srcCookie)
 
     def fillHolesByGravity(self, debug = False):
+        """
+        Fill-up gaps on the puzzle (holes) by moving dots from top to fill-up the gap in the bottom.
+        :param debug: debugging flag
+        """
         for i in range(self.cols):
             for j in range(self.rows):
                 t = self.get(i, j)
@@ -84,6 +119,10 @@ class Board:
                 print("finished col %d" % i)
 
     def fillHolesWithNewCookies(self, debug = False):
+        """
+        Fill-up all remaining holes with new dots sourced from the generator object used to create this Board.
+        :param debug: debugging flag
+        """
         for i in range(self.cols):
             for j in range(self.rows):
                 t = self.get(i, j)
@@ -96,6 +135,9 @@ class Board:
                     t.put(c)
 
     def __str__(self):
+        """
+        Convenient function to let you visualize the contents on the Board.
+        """
         result = "Board {}x{}:\n".format(self.cols, self.rows)
 
         row1 = self.data[0]
@@ -108,8 +150,8 @@ class Board:
             result += '\t%d  ' % j
             for x in row:
                 assert isinstance(x, Tile)
-                if x.cookie is not None:
-                    result += x.cookie.color
+                if x.dot is not None:
+                    result += x.dot.color
                 else:
                     result += '_'
 
@@ -118,37 +160,70 @@ class Board:
         return result
 
 class Tile:
+    """
+    A Tile object represent a valid placement location on Board. A Tile may contain a dot or represent a blockage
+    location on the Board in which case is empty. It may also possess other special properties for added effects in
+    the game.
+    """
     def __init__(self, row, col):
+        """
+        Init a Tile object at location row, col on the Board.
+        :param row: row
+        :param col: col
+        """
+
         self.row = row
         self.col = col
-        self.cookie = None
+        self.dot = None
 
-    def put(self, cookie):
-        assert isinstance(cookie, Dot)
-        assert self.cookie is None, "Tile must be empty in put()!"
+    def put(self, dot):
+        """
+        Put a dot onto this Tile.
+        :param dot: dot object
+        """
+        assert isinstance(dot, Dot)
+        assert self.dot is None, "Tile must be empty in put()!"
 
-        self.cookie = cookie
-        cookie.tile = self
+        self.dot = dot
+        dot.tile = self
 
     def removeCookie(self):
-        if self.cookie is not None:
-            self.cookie.removeFromTile()
+        """
+        Remove a dot from this Tile.
+        """
+        if self.dot is not None:
+            self.dot.removeFromTile()
 
     def __str__(self):
-        if self.cookie is not None:
-            return "<Tile .cookie {self.cookie}, .row {self.row}, .col {self.col}>".format(self=self)
-        return "<Tile .cookie None, .row {self.row}, .col {self.col}>".format(self=self)
+        if self.dot is not None:
+            return "<Tile .dot {self.dot}, .row {self.row}, .col {self.col}>".format(self=self)
+        return "<Tile .dot None, .row {self.row}, .col {self.col}>".format(self=self)
 
 class Dot:
+    """
+    Dot object represent a 'colored' dot on a Board. Every dots may move through various Tile locations on the Board
+    in a Dots game until it is removed from the game such as when a string of connected dots is discovered. A Dot may
+    also possess additional special attributes such as "Bomb", "Anchor" for special effects in the game.
+    """
+
     def __init__(self, color):
+        """
+        Create a Dot object with color in a game.
+        :param color: color attribute for the dot.
+        :return:
+        """
         self.color = color
         self.tile = None
 
     def removeFromTile(self):
+        """
+        Remove this Dot from its current Tile location.
+        :return:
+        """
         if self.tile is not None:
             tile = self.tile
             assert isinstance(tile, Tile)
-            tile.cookie = None
+            tile.dot = None
             self.tile = None
 
     def __str__(self):
@@ -158,6 +233,13 @@ class Dot:
 
 class RandomGen:
     def __init__(self, f, limit=None):
+        """
+        Create a Random generator that generate a random sequence of colors based on a requested frequency distribution
+        for colors. We are using this generator mainly to populate our Dots puzzle game.
+
+        :param f: Color versus normalized frequency table. E.g. {'a': .25, 'b': .25, 'c': .25, 'd': .25} creates
+                  color 'a', 'b', 'c' and 'd' with 25 percent each among the population.
+        """
         assert isinstance(f, dict)
         s = 0
         self.cdf = {}
@@ -194,6 +276,10 @@ class RandomGen:
             #print(a, self.cdf[a])
 
 class Connection:
+    """
+    Connection object represent a sequence of locations attempted by the player on a Board. For a valid dots connection
+    in Dots game, all dots on locations must share the same color.
+    """
     def __init__(self):
         self.positions = []
 
@@ -224,13 +310,23 @@ class Connection:
         return self.positions[index]
 
 def findAnyConnection(b, pos, depth = 0, connection = None, debug=False):
+    """
+    Given a starting position search the board (b) for a connected sequence of dots, all dots in a connection must
+    shard the same color.
+    :param b: Board object
+    :param pos: starting position on the Board for the search
+    :param depth: current search depth (debugging only)
+    :param connection: current connection object in the search
+    :param debug: debugging flag
+    :return: a Connection object
+    """
     assert isinstance(b, Board)
     assert isinstance(pos, tuple)
 
     i, j = pos
     t = b.get(i, j)
     assert isinstance(t, Tile)
-    assert t.cookie is not None
+    assert t.dot is not None
 
     if debug:
         print('  ' * depth, t)
@@ -248,15 +344,21 @@ def findAnyConnection(b, pos, depth = 0, connection = None, debug=False):
         if 0 <= i < b.cols and 0 <= j < b.rows:
             a = b.get(i, j)
             assert isinstance(a, Tile)
-            if nextPos not in connection and a.cookie is not None:
-                if t.cookie.color == a.cookie.color:
+            if nextPos not in connection and a.dot is not None:
+                if t.dot.color == a.dot.color:
                     findAnyConnection(b, nextPos, depth= depth + 1, connection= connection)
                     break
 
     return connection
 
-
 def findAnyValidConnection(b):
+    """
+    Attempt to find a valid dots connection on a board (b) randomly. A valid dots connection must share the same color
+    and must satisfy the minimum length of 3. We will be using this routine as our main AI player to play a game of
+    Dots.
+    :param b: Board object
+    :return: Connection object if found otherwise None when maximum attempts exceeded.
+    """
     assert isinstance(b, Board)
 
     result = None
@@ -273,11 +375,24 @@ def findAnyValidConnection(b):
     return result
 
 class Game:
+    """
+    Game host a Dots game. Utility methods we've created so far are consumed and chained together in this class to create
+    a playable Dots game.
+    """
     def __init__(self, b):
+        """
+        Create a Dots game with a Board, b.
+        :param b: Board object
+        """
         assert isinstance(b, Board)
         self.board = b
 
     def playOnce(self, debug=False):
+        """
+        Play a Dots game in a single iteration.
+        :param debug: debugging flag
+        :return: a tuple with color and a valid connection object found in this iteration
+        """
         result = None
         conn = findAnyValidConnection(self.board)
         if conn is None:
@@ -288,7 +403,7 @@ class Game:
             i, j = conn[0]
             t = self.board.get(i, j)
             assert isinstance(t, Tile)
-            result = (t.cookie.color, len(conn))
+            result = (t.dot.color, len(conn))
             self.board.remove(conn)
 
         if conn is not None:
@@ -306,6 +421,12 @@ class Game:
         return result
 
     def play(self, limit=30):
+        """
+        Play a Dots game until iteration limit has been reached.
+        :param limit: Iteration limit
+        :return: Dict with interesting statistical data in the game
+                e.g. Number of dots with a given color has been slashed off in this game.
+        """
         stat = {}
         for i in range(limit):
             print("iteration %d" % (i + 1))
