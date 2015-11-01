@@ -6,8 +6,8 @@ with some exercises on Python to create a simulator which simulate a popular mob
 As students work through the assignment, students get to learn important concepts in programming from abstraction down
 to implementation of the project.
 
-* See [test.py](../blob/master/samples/dots-simulator/test.py) for gradual breakdown of independent challenges while we
+* See [test.py](test.py) for gradual breakdown of independent challenges while we
   build the simulator.
   
-* See [game.py](blob/master/samples/dots-simulator/game.py) for the sample solution.
+* See [game.py](game.py) for the sample solution.
 
