@@ -7,7 +7,7 @@ As students work through the assignment, students get to learn important concept
 to implementation of the project.
 
 * See [test.py](test.py) for gradual breakdown of independent challenges while we
-  build the simulator.
+  build the simulator. Students may want to adapt similar outlines to try out their implementation as they work on their implementation.
   
 * See [game.py](game.py) for the sample solution.
 
